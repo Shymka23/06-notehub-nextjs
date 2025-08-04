@@ -2,22 +2,19 @@
 
 import css from "./error.module.css";
 
-type ErrorProps = {
-  error: Error;
+interface ErrorProps {
+  error: Error & { digest?: string };
   reset: () => void;
-};
+}
 
-const Error: React.FC<ErrorProps> = ({ error, reset }) => {
+export default function Error({ error, reset }: ErrorProps) {
   return (
-    <div className={css.container}>
-      <p className={css.text}>
-        Could not fetch the list of notes. {error.message}
-      </p>
-      <button className={css.reset} onClick={reset}>
-        reset
+    <div className={css.errorContainer}>
+      <h2 className={css.errorTitle}>Could not fetch the list of notes</h2>
+      <p className={css.errorMessage}>{error.message}</p>
+      <button onClick={reset} className={css.retryButton}>
+        Try again
       </button>
     </div>
   );
-};
-
-export default Error;
+}

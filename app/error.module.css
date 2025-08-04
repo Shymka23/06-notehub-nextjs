@@ -3,7 +3,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 300px;
+  min-height: 200px;
   padding: 2rem;
   text-align: center;
 }
@@ -34,4 +34,8 @@
 
 .retryButton:hover {
   background-color: #0051cc;
+}
+
+.retryButton:active {
+  transform: translateY(1px);
 }

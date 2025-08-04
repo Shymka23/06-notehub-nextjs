@@ -12,11 +12,21 @@ type Props = {
 
 const NoteDetails = async ({ params }: Props) => {
   const { id } = await params;
+
+  if (!id || id.trim() === "") {
+    throw new Error("Invalid note ID");
+  }
+
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: ["note", id],
-    queryFn: () => fetchNoteById(id),
-  });
+
+  try {
+    await queryClient.prefetchQuery({
+      queryKey: ["note", id],
+      queryFn: () => fetchNoteById(id),
+    });
+  } catch {
+    // Prefetch error will be handled by the client component
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

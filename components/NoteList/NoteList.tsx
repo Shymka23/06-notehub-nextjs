@@ -17,29 +17,52 @@ export default function NoteList({ notes }: NoteListProps) {
     mutationFn: deleteNote,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
-      toast.success(`Note "${data.title}" deleted.`);
+      toast.success(`Note "${data.title}" deleted successfully.`);
     },
-    onError: () => {
-      toast.error(`Failed to delete note.`);
+    onError: (error) => {
+      toast.error(`Failed to delete note: ${error.message}`);
     },
   });
+
+  const handleDelete = (note: Note) => {
+    if (window.confirm(`Are you sure you want to delete "${note.title}"?`)) {
+      mutation.mutate(note.id);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
 
   return (
     <ul className={css.list}>
       {notes.map((note) => (
         <li className={css.listItem} key={note.id}>
-          <Link href={`/notes/${note.id}`} className={css.titleLink}>
-            <h2 className={css.title}>{note.title}</h2>
-          </Link>
+          <div className={css.header}>
+            <Link href={`/notes/${note.id}`} className={css.titleLink}>
+              <h2 className={css.title}>{note.title}</h2>
+            </Link>
+            <span className={css.date}>{formatDate(note.createdAt)}</span>
+          </div>
           <p className={css.content}>{note.content}</p>
           <div className={css.footer}>
             <span className={css.tag}>{note.tag}</span>
-            <button
-              className={css.delete}
-              onClick={() => mutation.mutate(note.id)}
-            >
-              Delete
-            </button>
+            <div className={css.actions}>
+              <Link href={`/notes/${note.id}`} className={css.viewButton}>
+                View details
+              </Link>
+              <button
+                className={css.deleteButton}
+                onClick={() => handleDelete(note)}
+                disabled={mutation.isPending}
+              >
+                {mutation.isPending ? "Deleting..." : "Delete"}
+              </button>
+            </div>
           </div>
         </li>
       ))}

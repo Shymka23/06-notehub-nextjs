@@ -1,36 +1,163 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NoteHub - Personal Note Management App
 
-## Getting Started
+Сучасний та ефективний додаток для управління особистими нотатками з функцією пошуку та організованою структурою.
 
-First, run the development server:
+## 🚀 Особливості
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **📝 Створення та редагування нотаток** з багатим контентом
+- **🔍 Розширена функція пошуку** за ключовими словами
+- **🏷️ Організація нотаток** з тегами
+- **📱 Адаптивний дизайн** для всіх пристроїв
+- **⚡ Швидка та ефективна продуктивність**
+- **🔄 SSR та CSR підтримка**
+
+## 🛠️ Технології
+
+- **Next.js 15.4.4** - React фреймворк з App Router
+- **TypeScript** - типізація коду
+- **TanStack Query** - управління станом запитів
+- **Axios** - HTTP клієнт
+- **CSS Modules** - стилізація
+- **React Hot Toast** - сповіщення
+- **Formik + Yup** - форми та валідація
+
+## 📁 Структура проєкту
+
+```
+06-notehub-nextjs/
+├── app/
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── loading.tsx
+│   ├── error.tsx
+│   └── notes/
+│       ├── page.tsx
+│       ├── Notes.client.tsx
+│       ├── loading.tsx
+│       ├── error.tsx
+│       └── [id]/
+│           ├── page.tsx
+│           ├── NoteDetails.client.tsx
+│           ├── loading.tsx
+│           └── error.tsx
+├── components/
+│   ├── Header/
+│   ├── Footer/
+│   ├── NoteList/
+│   ├── NoteForm/
+│   ├── SearchBox/
+│   ├── Pagination/
+│   ├── Modal/
+│   ├── Loader/
+│   ├── ErrorMessage/
+│   ├── ErrorMessageEmpty/
+│   └── TanStackProvider/
+├── lib/
+│   └── api.ts
+├── types/
+│   └── note.ts
+└── public/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Запуск проєкту
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Клонування репозиторію:**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   git clone <repository-url>
+   cd 06-notehub-nextjs
+   ```
 
-## Learn More
+2. **Встановлення залежностей:**
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Налаштування змінних середовища:**
+   Створіть файл `.env.local` в корені проєкту:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```
+   NEXT_PUBLIC_NOTEHUB_TOKEN=your_api_token_here
+   ```
 
-## Deploy on Vercel
+4. **Запуск в режимі розробки:**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   ```bash
+   npm run dev
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+5. **Збірка для продакшену:**
+
+   ```bash
+   npm run build
+   npm start
+   ```
+
+## 📄 Маршрути
+
+- **/** - Головна сторінка з інформацією про додаток
+- **/notes** - Список всіх нотаток з пошуком та створенням
+- **/notes/[id]** - Детальна сторінка конкретної нотатки
+
+## 🔧 API Функції
+
+- `fetchNotes(search, page)` - отримання списку нотаток
+- `createNote(note)` - створення нової нотатки
+- `deleteNote(id)` - видалення нотатки
+- `fetchNoteById(id)` - отримання деталей нотатки
+
+## 🎨 Компоненти
+
+### Серверні компоненти (SSR)
+
+- `app/page.tsx` - головна сторінка
+- `app/notes/page.tsx` - сторінка списку нотаток
+- `app/notes/[id]/page.tsx` - сторінка деталей нотатки
+
+### Клієнтські компоненти (CSR)
+
+- `app/notes/Notes.client.tsx` - логіка списку нотаток
+- `app/notes/[id]/NoteDetails.client.tsx` - логіка деталей нотатки
+
+### Спільні компоненти
+
+- `Header` - навігація
+- `Footer` - футер з контактною інформацією
+- `NoteList` - список нотаток
+- `NoteForm` - форма створення/редагування
+- `SearchBox` - пошук
+- `Pagination` - пагінація
+- `Modal` - модальні вікна
+- `Loader` - індикатор завантаження
+- `ErrorMessage` - обробка помилок
+
+## 🔄 Стан запитів
+
+Використовується TanStack Query для:
+
+- Кешування даних
+- Автоматичного оновлення
+- Обробки помилок
+- Оптимістичних оновлень
+
+## 🎯 Оптимізації
+
+- **SSR/CSR гібрид** - серверний рендеринг з клієнтською гідратацією
+- **Prefetch** - попереднє завантаження даних
+- **Debounced search** - пошук з затримкою
+- **Error boundaries** - обробка помилок
+- **Loading states** - стани завантаження
+- **Responsive design** - адаптивний дизайн
+
+## 👨‍💻 Розробник
+
+**Yevhen Shymka**
+
+- Email: student@notehub.app
+- Проєкт: NoteHub
+
+## 📄 Ліцензія
+
+© 2024 NoteHub. All rights reserved.

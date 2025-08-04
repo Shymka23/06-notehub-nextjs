@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { Toaster } from "react-hot-toast";
 
-import { Note } from "@/types/note";
+import { NotesResponse } from "@/types/note";
 import Pagination from "@/components/Pagination/Pagination";
 import { Loader } from "@/components/Loader/Loader";
 import { ErrorMessage } from "@/components/ErrorMessage/ErrorMessage";
@@ -19,10 +19,7 @@ import { fetchNotes } from "@/lib/api";
 import { SearchBox } from "@/components/SearchBox/SearchBox";
 
 interface NotesClientProps {
-  initialData: {
-    notes: Note[];
-    totalPages: number;
-  };
+  initialData: NotesResponse;
   initialQuery: string;
   initialPage: number;
 }
@@ -36,7 +33,7 @@ export default function NotesClient({
   const [query, setQuery] = useState(initialQuery);
   const [isOpenModal, setIsOpenModal] = useState(false);
 
-  const { data, isError, isLoading, isSuccess } = useQuery({
+  const { data, isError, isLoading, isSuccess, refetch } = useQuery({
     queryKey: ["notes", query, currentPage],
     queryFn: () => fetchNotes(query, currentPage),
     placeholderData: keepPreviousData,
@@ -45,6 +42,7 @@ export default function NotesClient({
   });
 
   const totalPages = data?.totalPages ?? 0;
+  const notes = data?.notes ?? [];
 
   const handleCreateNote = () => {
     setIsOpenModal(true);
@@ -59,6 +57,11 @@ export default function NotesClient({
     },
     1000
   );
+
+  const handleRetry = () => {
+    refetch();
+  };
+
   return (
     <div className={css.app}>
       <div className={css.toolbar}>
@@ -74,11 +77,33 @@ export default function NotesClient({
           Create note +
         </button>
       </div>
+
       {isLoading && <Loader />}
-      {isError && <ErrorMessage />}
-      <Toaster position="top-right" />
-      {isSuccess && data?.notes.length === 0 && <ErrorMessageEmpty />}
-      {isSuccess && data.notes.length > 0 && <NoteList notes={data.notes} />}
+
+      {isError && (
+        <div className={css.errorContainer}>
+          <ErrorMessage />
+          <button onClick={handleRetry} className={css.retryButton}>
+            Try again
+          </button>
+        </div>
+      )}
+
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "#363636",
+            color: "#fff",
+          },
+        }}
+      />
+
+      {isSuccess && notes.length === 0 && <ErrorMessageEmpty />}
+
+      {isSuccess && notes.length > 0 && <NoteList notes={notes} />}
+
       {isOpenModal && (
         <Modal onClose={handleCloseModal}>
           <NoteForm onClose={handleCloseModal} />
