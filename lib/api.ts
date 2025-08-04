@@ -3,9 +3,15 @@ import { FormValues, Note, NotesResponse } from "@/types/note";
 
 const API_BASE_URL = "https://notehub-public.goit.study/api/notes";
 
-const getAuthHeaders = () => ({
-  Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-});
+const getAuthHeaders = () => {
+  const token = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
+  if (!token) {
+    throw new Error("API token is not configured");
+  }
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+};
 
 export const fetchNotes = async (
   search: string,
@@ -26,6 +32,9 @@ export const fetchNotes = async (
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
+      if (error.response?.status === 401) {
+        throw new Error("Invalid token - please check your API configuration");
+      }
       throw new Error(
         `Failed to fetch notes: ${error.response?.data?.message || error.message}`
       );
