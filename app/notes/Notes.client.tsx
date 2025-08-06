@@ -3,8 +3,9 @@
 import css from "./NotePage.module.css";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Toaster } from "react-hot-toast";
 
 import { NotesResponse } from "@/types/note";
@@ -19,7 +20,7 @@ import { fetchNotes } from "@/lib/api";
 import { SearchBox } from "@/components/SearchBox/SearchBox";
 
 interface NotesClientProps {
-  initialData: NotesResponse;
+  initialData?: NotesResponse;
   initialQuery: string;
   initialPage: number;
 }
@@ -29,16 +30,52 @@ export default function NotesClient({
   initialQuery,
   initialPage,
 }: NotesClientProps) {
-  const [currentPage, setCurrentPage] = useState(initialPage);
-  const [query, setQuery] = useState(initialQuery);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Отримуємо параметри з URL або використовуємо початкові значення
+  const urlQuery = searchParams.get("search") || initialQuery;
+  const urlPage = parseInt(
+    searchParams.get("page") || initialPage.toString(),
+    10
+  );
+
+  const [currentPage, setCurrentPage] = useState(urlPage);
+  const [query, setQuery] = useState(urlQuery);
   const [isOpenModal, setIsOpenModal] = useState(false);
+
+  // Синхронізуємо стан з URL параметрами
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+
+    if (query !== initialQuery) {
+      params.set("search", query);
+    } else {
+      params.delete("search");
+    }
+
+    if (currentPage !== initialPage) {
+      params.set("page", currentPage.toString());
+    } else {
+      params.delete("page");
+    }
+
+    const newUrl = params.toString() ? `?${params.toString()}` : "";
+    router.replace(`/notes${newUrl}`, { scroll: false });
+  }, [query, currentPage, router, searchParams, initialQuery, initialPage]);
 
   const { data, isError, isLoading, isSuccess, refetch } = useQuery({
     queryKey: ["notes", query, currentPage],
     queryFn: () => fetchNotes(query, currentPage),
     placeholderData: keepPreviousData,
-    initialData,
+    // Використовуємо initialData тільки для початкового запиту
+    initialData:
+      query === initialQuery && currentPage === initialPage && initialData
+        ? initialData
+        : undefined,
     refetchOnMount: false,
+    // Якщо немає initialData, завантажуємо дані одразу
+    enabled: true,
   });
 
   const totalPages = data?.totalPages ?? 0;
@@ -70,7 +107,9 @@ export default function NotesClient({
           <Pagination
             page={currentPage}
             total={totalPages}
-            onChange={setCurrentPage}
+            onChange={(page: number) => {
+              setCurrentPage(page);
+            }}
           />
         )}
         <button onClick={handleCreateNote} className={css.button}>

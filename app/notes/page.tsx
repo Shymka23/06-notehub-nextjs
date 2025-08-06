@@ -4,9 +4,19 @@ import { fetchNotes } from "@/lib/api";
 // Робимо сторінку динамічною для уникнення проблем з пререндерингом
 export const dynamic = "force-dynamic";
 
-export default async function Notes() {
-  const initialQuery = "";
-  const initialPage = 1;
+interface SearchParams {
+  search?: string;
+  page?: string;
+}
+
+export default async function Notes({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const params = await searchParams;
+  const initialQuery = params.search || "";
+  const initialPage = parseInt(params.page || "1", 10);
 
   try {
     const initialData = await fetchNotes(initialQuery, initialPage);
@@ -21,13 +31,9 @@ export default async function Notes() {
   } catch (error) {
     console.error("Error fetching initial data:", error);
 
-    // Повертаємо компонент з порожніми даними, який завантажить дані на клієнті
+    // При помилці не передаємо initialData, щоб уникнути проблем з гідратацією
     return (
-      <NotesClient
-        initialData={{ notes: [], totalPages: 0 }}
-        initialQuery={initialQuery}
-        initialPage={initialPage}
-      />
+      <NotesClient initialQuery={initialQuery} initialPage={initialPage} />
     );
   }
 }
