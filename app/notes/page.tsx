@@ -4,19 +4,9 @@ import { fetchNotes } from "@/lib/api";
 // Робимо сторінку динамічною для уникнення проблем з пререндерингом
 export const dynamic = "force-dynamic";
 
-interface SearchParams {
-  search?: string;
-  page?: string;
-}
-
-export default async function Notes({
-  searchParams,
-}: {
-  searchParams: Promise<SearchParams>;
-}) {
-  const params = await searchParams;
-  const initialQuery = params.search || "";
-  const initialPage = parseInt(params.page || "1", 10);
+export default async function Notes() {
+  const initialQuery = "";
+  const initialPage = 1;
 
   try {
     const initialData = await fetchNotes(initialQuery, initialPage);

@@ -3,9 +3,8 @@
 import css from "./NotePage.module.css";
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Toaster } from "react-hot-toast";
 
 import { NotesResponse } from "@/types/note";
@@ -30,39 +29,9 @@ export default function NotesClient({
   initialQuery,
   initialPage,
 }: NotesClientProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // Отримуємо параметри з URL або використовуємо початкові значення
-  const urlQuery = searchParams.get("search") || initialQuery;
-  const urlPage = parseInt(
-    searchParams.get("page") || initialPage.toString(),
-    10
-  );
-
-  const [currentPage, setCurrentPage] = useState(urlPage);
-  const [query, setQuery] = useState(urlQuery);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [query, setQuery] = useState(initialQuery);
   const [isOpenModal, setIsOpenModal] = useState(false);
-
-  // Синхронізуємо стан з URL параметрами
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-
-    if (query !== initialQuery) {
-      params.set("search", query);
-    } else {
-      params.delete("search");
-    }
-
-    if (currentPage !== initialPage) {
-      params.set("page", currentPage.toString());
-    } else {
-      params.delete("page");
-    }
-
-    const newUrl = params.toString() ? `?${params.toString()}` : "";
-    router.replace(`/notes${newUrl}`, { scroll: false });
-  }, [query, currentPage, router, searchParams, initialQuery, initialPage]);
 
   const { data, isError, isLoading, isSuccess, refetch } = useQuery({
     queryKey: ["notes", query, currentPage],
